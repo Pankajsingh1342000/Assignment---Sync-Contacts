@@ -25,6 +25,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import android.content.Context
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class NewContactsFoundFragment : Fragment() {
 
@@ -36,8 +40,11 @@ class NewContactsFoundFragment : Fragment() {
     private lateinit var recyclerViewNewContacts: RecyclerView
     private lateinit var progressBar: ProgressBar
     private lateinit var buttonSyncAllContacts: TextView
+    private lateinit var textLastSyncedDate: TextView
 
     private val EDITED_NEW_CONTACT_KEY = "editedNewContact"
+    private val PREFS_NAME = "SyncContactsPrefs"
+    private val LAST_SYNCED_KEY = "lastSyncedDate"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,10 +60,12 @@ class NewContactsFoundFragment : Fragment() {
         recyclerViewNewContacts = view.findViewById(R.id.recycler_view_new_contacts)
         progressBar = view.findViewById(R.id.progress_bar)
         buttonSyncAllContacts = view.findViewById(R.id.button_sync_all_contacts)
+        textLastSyncedDate = view.findViewById(R.id.text_last_synced_date)
 
         setupRecyclerView()
         observeViewModel()
         observeEditedContactResult()
+        loadLastSyncedDate()
 
         buttonSyncAllContacts.setOnClickListener {
             syncAllContacts()
@@ -194,6 +203,11 @@ class NewContactsFoundFragment : Fragment() {
                     "Successfully synced $syncedCount contacts"
                 }
                 Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+
+                if (failedCount == 0 && syncedCount > 0) {
+                    saveLastSyncedDate()
+                    updateLastSyncedDateText()
+                }
             }
         }
     }
@@ -211,5 +225,29 @@ class NewContactsFoundFragment : Fragment() {
             return cursor.moveToFirst()
         }
         return false
+    }
+
+    private fun saveLastSyncedDate() {
+        val sharedPrefs = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val editor = sharedPrefs.edit()
+        val currentDate = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date())
+        editor.putString(LAST_SYNCED_KEY, currentDate)
+        editor.apply()
+    }
+
+    private fun loadLastSyncedDate() {
+        val sharedPrefs = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val lastSyncedDate = sharedPrefs.getString(LAST_SYNCED_KEY, null)
+        if (lastSyncedDate != null) {
+            textLastSyncedDate.text = lastSyncedDate
+        } else {
+            textLastSyncedDate.text = "N/A"
+        }
+    }
+    
+    private fun updateLastSyncedDateText() {
+        val sharedPrefs = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val lastSyncedDate = sharedPrefs.getString(LAST_SYNCED_KEY, "N/A")
+        textLastSyncedDate.text = lastSyncedDate
     }
 } 
