@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:id="@+id/nav_graph"
+             app:startDestination="@id/contactsFragment">
+
+    <!-- Placeholder Fragments for Bottom Navigation -->
+    <fragment
+        android:id="@+id/contactsFragment"
+        android:name="com.example.synccontacts.presentation.ui.ContactsFragment"
+        android:label="Contacts"
+        tools:layout="@layout/fragment_contacts">
+        <!-- Action to navigate to AddContactFragment -->
+        <action
+            android:id="@+id/action_contactsFragment_to_addContactFragment"
+            app:destination="@id/addContactFragment" />
+        <!-- Action to navigate to NewContactsFoundFragment -->
+        <action
+            android:id="@+id/action_contactsFragment_to_newContactsFoundFragment"
+            app:destination="@id/newContactsFoundFragment" />
+        <!-- Action to navigate to EditContactFragment - This will be triggered from the contact list in ContactsFragment -->
+        <action
+            android:id="@+id/action_contactsFragment_to_editContactFragment"
+            app:destination="@id/editContactFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/favouritesFragment"
+        android:name="com.example.synccontacts.presentation.ui.FavouritesFragment"
+        android:label="Favourites"
+        tools:layout="@layout/fragment_favourites">
+    </fragment>
+
+    <fragment
+        android:id="@+id/recentFragment"
+        android:name="com.example.synccontacts.presentation.ui.RecentFragment"
+        android:label="Recent"
+        tools:layout="@layout/fragment_recent">
+    </fragment>
+
+    <!-- Other Fragments -->
+    <fragment
+        android:id="@+id/addContactFragment"
+        android:name="com.example.synccontacts.presentation.ui.AddContactFragment"
+        android:label="Add Contact"
+        tools:layout="@layout/fragment_add_contact">
+    </fragment>
+
+    <fragment
+        android:id="@+id/newContactsFoundFragment"
+        android:name="com.example.synccontacts.presentation.ui.NewContactsFoundFragment"
+        android:label="New Contacts Found"
+        tools:layout="@layout/fragment_new_contacts_found">
+        <!-- Action to navigate to EditContactFragment from here (for editing newly found contacts before sync) -->
+        <action
+            android:id="@+id/action_newContactsFoundFragment_to_editContactFragment"
+            app:destination="@id/editContactFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/editContactFragment"
+        android:name="com.example.synccontacts.presentation.ui.EditContactFragment"
+        android:label="Edit Contact"
+        tools:layout="@layout/fragment_edit_contact">
+        <!-- Argument to receive the contact URI for editing existing device contacts -->
+        <argument
+            android:name="contactUri"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <!-- Argument to receive a new Contact object for editing before saving -->
+        <argument
+            android:name="newContact"
+            app:argType="com.example.synccontacts.data.Contact"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
+
+</navigation>
