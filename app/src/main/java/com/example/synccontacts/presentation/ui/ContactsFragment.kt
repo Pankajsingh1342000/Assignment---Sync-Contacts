@@ -5,8 +5,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.ImageView
 import android.widget.ProgressBar
-import android.widget.SearchView
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -15,8 +16,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.example.synccontacts.R
 import com.example.synccontacts.presentation.viewmodels.ContactsViewModel
+import android.text.TextWatcher
+import android.text.Editable
 
-class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
+class ContactsFragment : Fragment() {
 
     private val viewModel: ContactsViewModel by viewModels()
 
@@ -25,7 +28,9 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
     private lateinit var progressBarContacts: ProgressBar
     private lateinit var fabAddContact: FloatingActionButton
     private lateinit var fabSyncContacts: FloatingActionButton
-    private lateinit var searchView: SearchView
+    private lateinit var editTextSearch: EditText
+    private lateinit var imageMicIcon: ImageView
+    private lateinit var imageThreeDotsIcon: ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,25 +47,22 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
         progressBarContacts = view.findViewById(R.id.progress_bar_contacts)
         fabAddContact = view.findViewById(R.id.fab_add_contact)
         fabSyncContacts = view.findViewById(R.id.fab_sync_contacts)
-        searchView = view.findViewById(R.id.search_view)
+
+        val customSearchBar = view.findViewById<View>(R.id.custom_search_bar)
+        editTextSearch = customSearchBar.findViewById(R.id.edit_text_search)
+        imageMicIcon = customSearchBar.findViewById(R.id.image_mic_icon)
+        imageThreeDotsIcon = customSearchBar.findViewById(R.id.image_three_dots_icon)
 
         setupRecyclerView()
         observeViewModel()
-        setupSearchView()
-
-        fabAddContact.setOnClickListener {
-            findNavController().navigate(R.id.action_contactsFragment_to_addContactFragment)
-        }
-
-        fabSyncContacts.setOnClickListener {
-            findNavController().navigate(R.id.action_contactsFragment_to_newContactsFoundFragment)
-        }
+        setupSearch()
+        setupFabListeners()
     }
 
     private fun setupRecyclerView() {
         contactAdapter = ContactAdapter {
             if (it.lookupUri != null) {
-                val action = ContactsFragmentDirections.actionContactsFragmentToEditContactFragment(it.lookupUri.toString())
+                val action = ContactsFragmentDirections.actionContactsFragmentToEditContactFragment(contactUri = it.lookupUri.toString())
                 findNavController().navigate(action)
             } else {
                 Toast.makeText(requireContext(), "Cannot edit this contact", Toast.LENGTH_SHORT).show()
@@ -86,17 +88,26 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
         }
     }
 
-    private fun setupSearchView() {
-        searchView.setOnQueryTextListener(this)
+    private fun setupSearch() {
+        editTextSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.filterContacts(s.toString())
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
     }
 
-    override fun onQueryTextSubmit(query: String?): Boolean {
-        return false
-    }
+    private fun setupFabListeners() {
+         fabAddContact.setOnClickListener {
+            findNavController().navigate(R.id.action_contactsFragment_to_addContactFragment)
+        }
 
-    override fun onQueryTextChange(newText: String?): Boolean {
-        viewModel.filterContacts(newText)
-        return true
+        fabSyncContacts.setOnClickListener {
+            findNavController().navigate(R.id.action_contactsFragment_to_newContactsFoundFragment)
+        }
     }
 
     override fun onResume() {

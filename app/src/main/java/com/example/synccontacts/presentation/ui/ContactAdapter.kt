@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -14,6 +15,13 @@ class ContactAdapter(
     private val onContactClick: (DeviceContact) -> Unit
 ) : ListAdapter<DeviceContact, ContactAdapter.ContactViewHolder>(ContactDiffCallback()) {
 
+    private val colors = listOf(
+        R.color.initial_bg_blue,
+        R.color.initial_bg_purple,
+        R.color.initial_bg_green,
+        R.color.initial_bg_red
+    )
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.list_item_contact, parent, false)
@@ -22,16 +30,19 @@ class ContactAdapter(
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
         val contact = getItem(position)
-        holder.bind(contact, onContactClick)
+        holder.bind(contact, onContactClick, colors[position % colors.size])
     }
 
     class ContactViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val initialTextView: TextView = itemView.findViewById(R.id.text_contact_initial)
         private val nameTextView: TextView = itemView.findViewById(R.id.text_contact_name)
-        private val phoneTextView: TextView = itemView.findViewById(R.id.text_contact_phone)
 
-        fun bind(deviceContact: DeviceContact, onContactClick: (DeviceContact) -> Unit) {
+        fun bind(deviceContact: DeviceContact, onContactClick: (DeviceContact) -> Unit, bgColor: Int) {
+            val initial = deviceContact.name?.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
+            initialTextView.text = initial
+            initialTextView.background.setColorFilter(ContextCompat.getColor(itemView.context, bgColor), android.graphics.PorterDuff.Mode.SRC_IN)
+
             nameTextView.text = deviceContact.name ?: "No Name"
-            phoneTextView.text = deviceContact.phoneNumber ?: "No Phone"
 
             itemView.setOnClickListener { onContactClick(deviceContact) }
         }
