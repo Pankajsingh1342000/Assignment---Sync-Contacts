@@ -57,6 +57,20 @@ class ContactsFragment : Fragment() {
         observeViewModel()
         setupSearch()
         setupFabListeners()
+        observeSavedState()
+    }
+
+    private fun observeSavedState() {
+        val navController = findNavController()
+        val currentBackStackEntry = navController.currentBackStackEntry
+        val savedStateHandle = currentBackStackEntry?.savedStateHandle
+
+        savedStateHandle?.getLiveData<Boolean>("forceRefresh")?.observe(viewLifecycleOwner) { forceRefresh ->
+            if (forceRefresh) {
+                viewModel.loadContacts(true)
+                savedStateHandle.remove<Boolean>("forceRefresh")
+            }
+        }
     }
 
     private fun setupRecyclerView() {
@@ -112,6 +126,6 @@ class ContactsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.loadContacts()
+        viewModel.loadContacts(false)
     }
 } 

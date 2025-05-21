@@ -24,24 +24,36 @@ class ContactsViewModel(application: Application) : AndroidViewModel(application
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
+    private var cachedContacts: List<DeviceContact>? = null
+    private var lastLoadTime: Long = 0
+    private val CACHE_DURATION = 5 * 60 * 1000
+
     init {
         loadContacts()
     }
 
-    fun loadContacts() {
+    fun loadContacts(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
             try {
-                val deviceContacts = withContext(Dispatchers.IO) {
-                    queryDeviceContacts()
+                val currentTime = System.currentTimeMillis()
+                if (!forceRefresh && cachedContacts != null && (currentTime - lastLoadTime) < CACHE_DURATION) {
+                    _allContacts.value = cachedContacts!!
+                    _filteredContacts.value = cachedContacts!!
+                } else {
+                    val deviceContacts = withContext(Dispatchers.IO) {
+                        queryDeviceContacts()
+                    }
+                    cachedContacts = deviceContacts
+                    lastLoadTime = currentTime
+                    _allContacts.value = deviceContacts
+                    _filteredContacts.value = deviceContacts
                 }
-                _allContacts.value = deviceContacts
-                _filteredContacts.value = deviceContacts
             } catch (e: SecurityException) {
-                 _error.value = "Permission denied to read contacts. Please grant the permission in Settings."
-                 _allContacts.value = emptyList()
-                 _filteredContacts.value = emptyList()
+                _error.value = "Permission denied to read contacts. Please grant the permission in Settings."
+                _allContacts.value = emptyList()
+                _filteredContacts.value = emptyList()
             } catch (e: Exception) {
                 _error.value = "Failed to load contacts: ${e.message}"
                 _allContacts.value = emptyList()
@@ -67,16 +79,18 @@ class ContactsViewModel(application: Application) : AndroidViewModel(application
 
     private fun queryDeviceContacts(): List<DeviceContact> {
         val contactsList = mutableListOf<DeviceContact>()
-        val uri: Uri = ContactsContract.Contacts.CONTENT_URI
+
+        val uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
         val projection = arrayOf(
             ContactsContract.Contacts._ID,
             ContactsContract.Contacts.LOOKUP_KEY,
             ContactsContract.Contacts.DISPLAY_NAME_PRIMARY,
-            ContactsContract.Contacts.HAS_PHONE_NUMBER
+            ContactsContract.CommonDataKinds.Phone.NUMBER
         )
-        val selection: String? = null
-        val selectionArgs: Array<String>? = null
-        val sortOrder: String = "${ContactsContract.Contacts.DISPLAY_NAME_PRIMARY} ASC"
+        
+        val selection = "${ContactsContract.CommonDataKinds.Phone.TYPE} = ?"
+        val selectionArgs = arrayOf(ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE.toString())
+        val sortOrder = "${ContactsContract.Contacts.DISPLAY_NAME_PRIMARY} ASC"
 
         getApplication<Application>().contentResolver.query(
             uri,
@@ -88,31 +102,13 @@ class ContactsViewModel(application: Application) : AndroidViewModel(application
             val idColumn = cursor.getColumnIndex(ContactsContract.Contacts._ID)
             val lookupKeyColumn = cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY)
             val nameColumn = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY)
-            val hasPhoneNumberColumn = cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)
+            val phoneColumn = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
 
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
                 val lookupKey = cursor.getString(lookupKeyColumn)
                 val name = cursor.getString(nameColumn)
-                val hasPhoneNumber = cursor.getInt(hasPhoneNumberColumn) > 0
-
-                var phoneNumber: String? = null
-                if (hasPhoneNumber) {
-
-                    val phoneCursor = getApplication<Application>().contentResolver.query(
-                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                        arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER),
-                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                        arrayOf(id.toString()),
-                        null
-                    )
-                    phoneCursor?.use { pCur ->
-                        if (pCur.moveToFirst()) {
-                            phoneNumber = pCur.getString(pCur.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER))
-                        }
-                    }
-                }
-
+                val phoneNumber = cursor.getString(phoneColumn)
                 val contactUri = ContactsContract.Contacts.getLookupUri(id, lookupKey)
 
                 contactsList.add(DeviceContact(id, lookupKey, name, phoneNumber, null, contactUri))

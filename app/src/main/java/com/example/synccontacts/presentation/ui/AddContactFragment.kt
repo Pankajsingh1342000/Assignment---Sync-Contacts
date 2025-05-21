@@ -95,6 +95,7 @@ class AddContactFragment : Fragment() {
             }
 
             Toast.makeText(requireContext(), "Contact saved", Toast.LENGTH_SHORT).show()
+            findNavController().previousBackStackEntry?.savedStateHandle?.set("forceRefresh", true)
             findNavController().popBackStack()
 
         } else {
