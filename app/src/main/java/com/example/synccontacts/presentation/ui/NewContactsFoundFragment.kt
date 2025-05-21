@@ -202,9 +202,11 @@ class NewContactsFoundFragment : Fragment() {
                 } else {
                     "Successfully synced $syncedCount contacts"
                 }
-                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                // Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
 
                 if (failedCount == 0 && syncedCount > 0) {
+                    val successDialog = SyncSuccessDialogFragment()
+                    successDialog.show(parentFragmentManager, "SyncSuccessDialog")
                     saveLastSyncedDate()
                     updateLastSyncedDateText()
                 }
