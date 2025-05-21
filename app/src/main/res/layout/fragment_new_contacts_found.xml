@@ -5,6 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    android:paddingHorizontal="16dp"
     tools:context=".presentation.ui.NewContactsFoundFragment">
 
     <TextView
@@ -12,20 +14,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="New contacts found"
-        android:textSize="20sp"
+        android:textSize="24sp"
         android:textStyle="bold"
+        android:textColor="@color/black"
         android:layout_marginTop="16dp"
+        android:layout_marginStart="24dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_new_contacts"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:paddingHorizontal="16dp"
         app:layout_constraintTop_toBottomOf="@+id/text_new_contacts_title"
-        app:layout_constraintBottom_toTopOf="@+id/button_sync_all_contacts"
+        app:layout_constraintBottom_toTopOf="@+id/layout_sync_info"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:listitem="@layout/list_item_contact_new_found"/>
@@ -40,14 +46,59 @@
         app:layout_constraintStart_toStartOf="@+id/recycler_view_new_contacts"
         app:layout_constraintEnd_toEndOf="@+id/recycler_view_new_contacts"/>
 
-    <Button
-        android:id="@+id/button_sync_all_contacts"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_sync_info"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="sync contacts"
+        android:orientation="horizontal"
         android:layout_marginBottom="16dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="last synced"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
+
+            <TextView
+                android:id="@+id/text_last_synced_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="22 may 2025"
+                android:textSize="12sp"
+                android:textColor="@color/black"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/button_sync_all_contacts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_gravity="center"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="10dp"
+            android:text="sync contacts"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textColor="@android:color/black"
+            android:background="@drawable/rounded_blue_gradient_button"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout> 

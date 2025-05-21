@@ -8,8 +8,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -35,7 +35,7 @@ class NewContactsFoundFragment : Fragment() {
     private lateinit var newContactAdapter: NewContactAdapter
     private lateinit var recyclerViewNewContacts: RecyclerView
     private lateinit var progressBar: ProgressBar
-    private lateinit var buttonSyncAllContacts: Button
+    private lateinit var buttonSyncAllContacts: TextView
 
     private val EDITED_NEW_CONTACT_KEY = "editedNewContact"
 
