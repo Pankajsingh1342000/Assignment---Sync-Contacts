@@ -10,12 +10,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.textfield.TextInputEditText
 import com.example.synccontacts.R
 import com.example.synccontacts.data.Contact
+import androidx.core.net.toUri
 
 class EditContactFragment : Fragment() {
 
@@ -34,7 +34,7 @@ class EditContactFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         return inflater.inflate(R.layout.fragment_edit_contact, container, false)
     }
@@ -58,7 +58,7 @@ class EditContactFragment : Fragment() {
             rawContactId = null
         } else if (!contactUriString.isNullOrEmpty()) {
             isEditingNewContact = false
-            val contactUri = Uri.parse(contactUriString)
+            val contactUri = contactUriString.toUri()
             loadContactDetails(contactUri)
         } else {
             Toast.makeText(requireContext(), "Error loading contact", Toast.LENGTH_SHORT).show()

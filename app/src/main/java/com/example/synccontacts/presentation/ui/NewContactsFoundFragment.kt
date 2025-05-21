@@ -12,7 +12,6 @@ import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -65,10 +64,7 @@ class NewContactsFoundFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        newContactAdapter = NewContactAdapter {
-            val action = NewContactsFoundFragmentDirections.actionNewContactsFoundFragmentToEditContactFragment(newContact = it)
-            findNavController().navigate(action)
-        }
+        newContactAdapter = NewContactAdapter()
         recyclerViewNewContacts.layoutManager = LinearLayoutManager(context)
         recyclerViewNewContacts.adapter = newContactAdapter
     }
@@ -94,11 +90,11 @@ class NewContactsFoundFragment : Fragment() {
         val currentBackStackEntry = navController.currentBackStackEntry
         val savedStateHandle = currentBackStackEntry?.savedStateHandle
 
-        savedStateHandle?.getLiveData<Contact>(EDITED_NEW_CONTACT_KEY)?.observe(viewLifecycleOwner, Observer {
-            editedContact ->
+        savedStateHandle?.getLiveData<Contact>(EDITED_NEW_CONTACT_KEY)?.observe(viewLifecycleOwner) { editedContact ->
             if (editedContact != null) {
                 val currentList = viewModel.newContacts.value?.toMutableList() ?: mutableListOf()
-                val index = currentList.indexOfFirst { it.phone == editedContact.phone } // Assuming phone is unique
+                val index =
+                    currentList.indexOfFirst { it.phone == editedContact.phone } // Assuming phone is unique
                 if (index != -1) {
                     currentList[index] = editedContact
 
@@ -107,7 +103,7 @@ class NewContactsFoundFragment : Fragment() {
                     savedStateHandle.remove<Contact>(EDITED_NEW_CONTACT_KEY)
                 }
             }
-        })
+        }
     }
 
     private fun syncAllContacts() {

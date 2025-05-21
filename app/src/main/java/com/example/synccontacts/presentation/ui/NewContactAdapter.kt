@@ -12,9 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.synccontacts.data.Contact
 import com.example.synccontacts.R
 
-class NewContactAdapter(
-    private val onEditClick: (Contact) -> Unit
-) : ListAdapter<Contact, NewContactAdapter.ContactViewHolder>(ContactDiffCallback()) {
+class NewContactAdapter : ListAdapter<Contact, NewContactAdapter.ContactViewHolder>(ContactDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -24,7 +22,7 @@ class NewContactAdapter(
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
         val contact = getItem(position)
-        holder.bind(contact, onEditClick)
+        holder.bind(contact)
     }
 
     class ContactViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -34,7 +32,7 @@ class NewContactAdapter(
         private val emailTextView: TextView = itemView.findViewById(R.id.text_contact_email)
         private val editIcon: ImageView = itemView.findViewById(R.id.image_edit_contact)
 
-        fun bind(contact: Contact, onEditClick: (Contact) -> Unit) {
+        fun bind(contact: Contact) {
             nameTextView.text = contact.name ?: "N/A"
             titleTextView.text = contact.title ?: "N/A"
             phoneTextView.text = contact.phone ?: "N/A"
