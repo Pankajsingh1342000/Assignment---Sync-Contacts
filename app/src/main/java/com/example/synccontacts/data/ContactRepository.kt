@@ -12,7 +12,7 @@ class ContactRepository(private val contactApiService: ContactApiService) {
             if (response.isSuccessful) {
                 val apiResponse = response.body()
                 if (apiResponse?.success == true) {
-                    // Map API users to our Contact model
+
                     apiResponse.Data.users.map { user ->
                         Contact(
                             name = user.fullName,

@@ -16,12 +16,10 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.textfield.TextInputEditText
 import com.example.synccontacts.R
 import com.example.synccontacts.data.Contact
-import com.example.synccontacts.presentation.viewmodels.EditContactViewModel
 
 class EditContactFragment : Fragment() {
 
     private val args: EditContactFragmentArgs by navArgs()
-    private val viewModel: EditContactViewModel by viewModels()
 
     private lateinit var editTextFirstName: TextInputEditText
     private lateinit var editTextSurname: TextInputEditText
@@ -198,7 +196,7 @@ class EditContactFragment : Fragment() {
         }
 
         if (isEditingNewContact) {
-            // Create an updated Contact object
+
             val updatedContact = args.newContact?.copy(
                 name = if (firstName.isNotEmpty() || surname.isNotEmpty()) "$firstName $surname".trim() else null,
                 title = company,
@@ -207,21 +205,22 @@ class EditContactFragment : Fragment() {
             )
 
             if (updatedContact != null) {
-                // Pass the updated contact back to the previous fragment using ViewModel and SavedStateHandle
-                viewModel.setEditedNewContact(updatedContact)
+
+                val navController = findNavController()
+                navController.previousBackStackEntry?.savedStateHandle?.set("editedNewContact", updatedContact)
+
             }
-            // Pop the back stack to return to NewContactsFoundFragment
+
             findNavController().popBackStack()
 
         } else {
-            // Update existing device contact
+
             if (rawContactId == null) {
                 Toast.makeText(requireContext(), "Contact not loaded for update", Toast.LENGTH_SHORT).show()
                 return
             }
             val operations = arrayListOf<ContentProviderOperation>()
 
-            // Update name
             val nameWhere = ContactsContract.Data.RAW_CONTACT_ID + " = ? AND " +
                     ContactsContract.Data.MIMETYPE + " = ?"
             val nameArgs = arrayOf(rawContactId.toString(), ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
@@ -232,7 +231,6 @@ class EditContactFragment : Fragment() {
                 .withValue(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME, surname)
                 .build())
 
-            // Update phone
             val phoneWhere = ContactsContract.Data.RAW_CONTACT_ID + " = ? AND " +
                     ContactsContract.Data.MIMETYPE + " = ?" + " AND " +
                     ContactsContract.CommonDataKinds.Phone.TYPE + " = ?"
@@ -243,7 +241,6 @@ class EditContactFragment : Fragment() {
                 .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, phone)
                 .build())
 
-            // Update company
             val companyWhere = ContactsContract.Data.RAW_CONTACT_ID + " = ? AND " +
                     ContactsContract.Data.MIMETYPE + " = ?"
             val companyArgs = arrayOf(rawContactId.toString(), ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE)

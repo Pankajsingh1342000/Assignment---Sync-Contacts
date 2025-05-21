@@ -1,6 +1,5 @@
 package com.example.synccontacts.presentation.ui
 
-import android.content.ContentProviderOperation
 import android.content.ContentValues
 import android.net.Uri
 import android.os.Bundle
@@ -15,10 +14,8 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.example.synccontacts.R
 import com.example.synccontacts.data.Contact
 import com.example.synccontacts.data.NetworkModule
@@ -41,7 +38,6 @@ class NewContactsFoundFragment : Fragment() {
     private lateinit var progressBar: ProgressBar
     private lateinit var buttonSyncAllContacts: Button
 
-    // Key for the edited contact passed back from EditContactFragment
     private val EDITED_NEW_CONTACT_KEY = "editedNewContact"
 
     override fun onCreateView(
@@ -49,7 +45,6 @@ class NewContactsFoundFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_new_contacts_found, container, false)
     }
 
@@ -71,8 +66,6 @@ class NewContactsFoundFragment : Fragment() {
 
     private fun setupRecyclerView() {
         newContactAdapter = NewContactAdapter {
-            // Handle edit icon click - navigate to EditContactFragment
-            // Pass the Contact object to EditContactFragment
             val action = NewContactsFoundFragmentDirections.actionNewContactsFoundFragmentToEditContactFragment(newContact = it)
             findNavController().navigate(action)
         }
@@ -97,7 +90,6 @@ class NewContactsFoundFragment : Fragment() {
     }
 
     private fun observeEditedContactResult() {
-        // Observe the SavedStateHandle for the edited contact
         val navController = findNavController()
         val currentBackStackEntry = navController.currentBackStackEntry
         val savedStateHandle = currentBackStackEntry?.savedStateHandle
@@ -105,23 +97,13 @@ class NewContactsFoundFragment : Fragment() {
         savedStateHandle?.getLiveData<Contact>(EDITED_NEW_CONTACT_KEY)?.observe(viewLifecycleOwner, Observer {
             editedContact ->
             if (editedContact != null) {
-                // Find the original contact in the current list and update it
                 val currentList = viewModel.newContacts.value?.toMutableList() ?: mutableListOf()
                 val index = currentList.indexOfFirst { it.phone == editedContact.phone } // Assuming phone is unique
                 if (index != -1) {
                     currentList[index] = editedContact
-                    // Update the ViewModel's LiveData with the modified list
-                    // This will trigger the adapter to update the RecyclerView
-                    // Note: Direct modification of _newContacts in ViewModel is needed.
-                    // For now, we'll simulate the update by submitting the list to the adapter.
-                    // A proper MVVM approach would have an update function in the ViewModel.
 
-                    // A more robust approach would be to have a function in ViewModel like:
-                    // viewModel.updateNewContactInList(editedContact)
-                    // which updates the internal list and LiveData.
-                    newContactAdapter.submitList(currentList.toList()) // Submit a copy to trigger diffing
+                    viewModel.updateNewContact(editedContact)
 
-                    // Clear the result so it's not re-handled
                     savedStateHandle.remove<Contact>(EDITED_NEW_CONTACT_KEY)
                 }
             }
@@ -155,12 +137,12 @@ class NewContactsFoundFragment : Fragment() {
                     val rawContactId = rawContactUri?.lastPathSegment?.toLong()
 
                     if (rawContactId != null) {
-                        // Add Name
+
                         if (!contact.name.isNullOrEmpty()) {
                             val nameValues = ContentValues().apply {
                                 put(ContactsContract.Data.RAW_CONTACT_ID, rawContactId)
                                 put(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
-                                // Safe name parsing
+
                                 val names = contact.name.trim().split(" ", limit = 2)
                                 put(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, names.firstOrNull() ?: contact.name)
                                 put(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME, names.getOrNull(1))
@@ -168,7 +150,6 @@ class NewContactsFoundFragment : Fragment() {
                             requireContext().contentResolver.insert(ContactsContract.Data.CONTENT_URI, nameValues)
                         }
 
-                        // Add Phone Number
                         if (!contact.phone.isNullOrEmpty()) {
                             val phoneValues = ContentValues().apply {
                                 put(ContactsContract.Data.RAW_CONTACT_ID, rawContactId)
@@ -179,7 +160,6 @@ class NewContactsFoundFragment : Fragment() {
                             requireContext().contentResolver.insert(ContactsContract.Data.CONTENT_URI, phoneValues)
                         }
 
-                        // Add Email
                         if (!contact.email.isNullOrEmpty()) {
                             val emailValues = ContentValues().apply {
                                 put(ContactsContract.Data.RAW_CONTACT_ID, rawContactId)
@@ -190,7 +170,6 @@ class NewContactsFoundFragment : Fragment() {
                             requireContext().contentResolver.insert(ContactsContract.Data.CONTENT_URI, emailValues)
                         }
 
-                        // Add Company/Title
                         if (!contact.title.isNullOrEmpty()) {
                             val orgValues = ContentValues().apply {
                                 put(ContactsContract.Data.RAW_CONTACT_ID, rawContactId)

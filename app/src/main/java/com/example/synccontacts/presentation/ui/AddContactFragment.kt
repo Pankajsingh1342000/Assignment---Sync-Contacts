@@ -27,7 +27,6 @@ class AddContactFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_add_contact, container, false)
     }
 
@@ -65,7 +64,7 @@ class AddContactFragment : Fragment() {
         val rawContactId = rawContactUri?.lastPathSegment?.toLong()
 
         if (rawContactId != null) {
-            // Add Name
+
             if (firstName.isNotEmpty() || surname.isNotEmpty()) {
                 val nameValues = ContentValues().apply {
                     put(ContactsContract.Data.RAW_CONTACT_ID, rawContactId)
@@ -76,7 +75,6 @@ class AddContactFragment : Fragment() {
                 requireContext().contentResolver.insert(ContactsContract.Data.CONTENT_URI, nameValues)
             }
 
-            // Add Phone Number
             if (phone.isNotEmpty()) {
                 val phoneValues = ContentValues().apply {
                     put(ContactsContract.Data.RAW_CONTACT_ID, rawContactId)
@@ -87,7 +85,6 @@ class AddContactFragment : Fragment() {
                 requireContext().contentResolver.insert(ContactsContract.Data.CONTENT_URI, phoneValues)
             }
 
-            // Add Company
             if (company.isNotEmpty()) {
                 val companyValues = ContentValues().apply {
                     put(ContactsContract.Data.RAW_CONTACT_ID, rawContactId)

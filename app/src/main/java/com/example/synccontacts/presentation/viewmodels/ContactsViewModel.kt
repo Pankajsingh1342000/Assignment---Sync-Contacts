@@ -37,7 +37,7 @@ class ContactsViewModel(application: Application) : AndroidViewModel(application
                     queryDeviceContacts()
                 }
                 _allContacts.value = deviceContacts
-                _filteredContacts.value = deviceContacts // Initially show all contacts
+                _filteredContacts.value = deviceContacts
             } catch (e: SecurityException) {
                  _error.value = "Permission denied to read contacts. Please grant the permission in Settings."
                  _allContacts.value = emptyList()
@@ -57,10 +57,10 @@ class ContactsViewModel(application: Application) : AndroidViewModel(application
         if (query.isNullOrEmpty()) {
             _filteredContacts.value = currentContacts
         } else {
-            val lowerCaseQuery = query.toLowerCase()
+            val lowerCaseQuery = query.lowercase()
             _filteredContacts.value = currentContacts.filter {
-                it.name?.toLowerCase()?.contains(lowerCaseQuery) == true ||
-                it.phoneNumber?.toLowerCase()?.contains(lowerCaseQuery) == true
+                it.name?.lowercase()?.contains(lowerCaseQuery) == true ||
+                it.phoneNumber?.lowercase()?.contains(lowerCaseQuery) == true
             }
         }
     }
@@ -72,7 +72,7 @@ class ContactsViewModel(application: Application) : AndroidViewModel(application
             ContactsContract.Contacts._ID,
             ContactsContract.Contacts.LOOKUP_KEY,
             ContactsContract.Contacts.DISPLAY_NAME_PRIMARY,
-            ContactsContract.Contacts.HAS_PHONE_NUMBER // Check if contact has phone number
+            ContactsContract.Contacts.HAS_PHONE_NUMBER
         )
         val selection: String? = null
         val selectionArgs: Array<String>? = null
@@ -98,7 +98,7 @@ class ContactsViewModel(application: Application) : AndroidViewModel(application
 
                 var phoneNumber: String? = null
                 if (hasPhoneNumber) {
-                    // Query for phone number for this specific contact
+
                     val phoneCursor = getApplication<Application>().contentResolver.query(
                         ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                         arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER),
@@ -120,7 +120,4 @@ class ContactsViewModel(application: Application) : AndroidViewModel(application
         }
         return contactsList
     }
-
-    // Although we have READ_CONTACTS in manifest, runtime permission check is needed on newer Android versions.
-    // This basic ViewModel doesn't handle runtime permissions. A real app would.
 } 

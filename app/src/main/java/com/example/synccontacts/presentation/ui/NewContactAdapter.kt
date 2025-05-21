@@ -41,7 +41,6 @@ class NewContactAdapter(
             emailTextView.text = contact.email ?: "N/A"
 
             editIcon.setOnClickListener {
-                // Use Safe Args generated action to navigate and pass the Contact object
                 val action = NewContactsFoundFragmentDirections.actionNewContactsFoundFragmentToEditContactFragment(newContact = contact)
                 itemView.findNavController().navigate(action)
             }

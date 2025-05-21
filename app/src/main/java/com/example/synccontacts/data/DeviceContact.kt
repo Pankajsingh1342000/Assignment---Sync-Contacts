@@ -8,5 +8,5 @@ data class DeviceContact(
     val name: String?,
     val phoneNumber: String?,
     val photoUri: Uri?,
-    val lookupUri: Uri? // Add lookupUri for easy navigation to edit
+    val lookupUri: Uri?
 ) 

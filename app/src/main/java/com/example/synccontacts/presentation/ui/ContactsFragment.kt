@@ -32,7 +32,6 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_contacts, container, false)
     }
 
@@ -60,7 +59,6 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private fun setupRecyclerView() {
         contactAdapter = ContactAdapter {
-            // Handle contact item click - navigate to EditContactFragment
             if (it.lookupUri != null) {
                 val action = ContactsFragmentDirections.actionContactsFragmentToEditContactFragment(it.lookupUri.toString())
                 findNavController().navigate(action)
@@ -93,7 +91,7 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        return false // Let the ViewModel handle the filtering
+        return false
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
@@ -103,7 +101,6 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
 
     override fun onResume() {
         super.onResume()
-        // Reload contacts every time the fragment is resumed
         viewModel.loadContacts()
     }
 } 

@@ -38,4 +38,13 @@ class NewContactsFoundViewModel(private val repository: ContactRepository) : Vie
             }
         }
     }
+
+    fun updateNewContact(updated: Contact) {
+        val current = _newContacts.value?.toMutableList() ?: return
+        val index = current.indexOfFirst { it.phone == updated.phone }
+        if (index != -1) {
+            current[index] = updated
+            _newContacts.value = current
+        }
+    }
 } 
