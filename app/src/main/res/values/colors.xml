@@ -10,4 +10,5 @@
     <color name="search_text_color">#919191</color>
     <color name="fab_bg_color">#2196F3</color>
     <color name="bottom_nav_selected">#D3D3D3</color>
+    <color name="circle_bg_light_blue">#B3E5FC</color>
 </resources>

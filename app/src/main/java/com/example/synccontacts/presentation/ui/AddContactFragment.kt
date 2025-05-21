@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.example.synccontacts.R
@@ -20,7 +20,7 @@ class AddContactFragment : Fragment() {
     private lateinit var editTextSurname: TextInputEditText
     private lateinit var editTextCompany: TextInputEditText
     private lateinit var editTextPhone: TextInputEditText
-    private lateinit var buttonSaveContact: Button
+    private lateinit var buttonSaveContact: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
