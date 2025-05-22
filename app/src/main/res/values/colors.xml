@@ -3,6 +3,14 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     
+    <!-- Theme Colors -->
+    <color name="primary">#919191</color>
+    <color name="primary_dark">#1976D2</color>
+    <color name="primary_light">#BBDEFB</color>
+    <color name="accent">#03A9F4</color>
+    <color name="secondary_container">#d9d9d9</color>
+    
+    <!-- Existing colors -->
     <color name="initial_bg_blue">#2196F3</color>
     <color name="initial_bg_purple">#9C27B0</color>
     <color name="initial_bg_green">#4CAF50</color>
